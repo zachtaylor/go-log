@@ -1,7 +1,9 @@
 package log
 
+var logger = NewLogger()
+
 func New() Log {
-	return Log{}
+	return logger.New()
 }
 
 func Add(name string, value interface{}) Log {
@@ -22,4 +24,12 @@ func Warn(message string) {
 
 func Error(message interface{}) {
 	New().Error(message)
+}
+
+func SetLevel(level string) {
+	logger.SetLevel(level)
+}
+
+func StartRoller(path string) {
+	logger.StartRoller(path)
 }
