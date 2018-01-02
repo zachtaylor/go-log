@@ -4,10 +4,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type Fields logrus.Fields
+
 type Log interface {
 	Clone() Log
 	Add(string, interface{}) Log
-	WithFields(map[string]interface{}) Log
+	WithFields(Fields) Log
 	Debug(...interface{})
 	Info(...interface{})
 	Warn(...interface{})
@@ -35,7 +37,7 @@ func (log *log) Add(k string, v interface{}) Log {
 	return log
 }
 
-func (log *log) WithFields(m map[string]interface{}) Log {
-	log.Entry = log.Entry.WithFields(m)
+func (log *log) WithFields(f Fields) Log {
+	log.Entry = log.Entry.WithFields(logrus.Fields(f))
 	return log
 }

@@ -26,6 +26,10 @@ func Error(message interface{}) {
 	New().Error(message)
 }
 
+func WithFields(f Fields) Log {
+	return New().WithFields(f)
+}
+
 func SetLevel(level string) {
 	logger.SetLevel(level)
 }

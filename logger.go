@@ -27,8 +27,8 @@ func (logger *Logger) New() Log {
 	return &log{logrus.NewEntry(logger.logger)}
 }
 
-func (logger *Logger) WithFields(fields logrus.Fields) Log {
-	return &log{logger.logger.WithFields(fields)}
+func (logger *Logger) WithFields(fields Fields) Log {
+	return &log{logger.logger.WithFields(logrus.Fields(fields))}
 }
 
 func (logger *Logger) StartRoller(path string) {
