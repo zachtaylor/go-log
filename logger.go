@@ -38,7 +38,7 @@ func (logger *Logger) WithFields(fields Fields) Log {
 func (logger *Logger) StartRoller(path string) {
 	go func() {
 		for {
-			file, err := os.OpenFile(path+time.Now().Format("2006_01_02")+".log", os.O_CREATE|os.O_WRONLY, 0666)
+			file, err := os.OpenFile(path+time.Now().Format("2006_01_02")+".log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
 			log := logger.Add("Path", file.Name())
 			if err == nil {
 				log.Info("proceeding on file")
