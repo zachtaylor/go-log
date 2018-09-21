@@ -4,12 +4,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type Fields logrus.Fields
+type Fields = logrus.Fields
 
 type Log interface {
 	Clone() Log
 	Add(string, interface{}) Log
 	WithFields(Fields) Log
+	Protect(f func())
 	Debug(...interface{})
 	Info(...interface{})
 	Warn(...interface{})
@@ -37,7 +38,12 @@ func (log *log) Add(k string, v interface{}) Log {
 	return log
 }
 
+func (log *log) Protect(f func()) {
+	defer log.recoverPanic()
+	f()
+}
+
 func (log *log) WithFields(f Fields) Log {
-	log.Entry = log.Entry.WithFields(logrus.Fields(f))
+	log.Entry = log.Entry.WithFields(f)
 	return log
 }
