@@ -3,9 +3,7 @@ package log
 import (
 	"fmt"
 	"strings"
-
-	"github.com/sirupsen/logrus"
-	"ztaylor.me/cast"
+	"time"
 )
 
 const (
@@ -13,48 +11,78 @@ const (
 	red     = "\x1b[31m"
 	green   = "\x1b[32m"
 	yellow  = "\x1b[33m"
+	purple  = "\x1b[35m"
 	blue    = "\x1b[36m"
-	gray    = "\x1b[37m"
 )
 
-type Formatter struct {
-	Color bool
+// Formatter encodes a log
+type Formatter interface {
+	// Format creates writable output
+	Format(time.Time, *Entry) []byte
 }
 
-func (f *Formatter) Format(e *logrus.Entry) ([]byte, error) {
-	var sb strings.Builder
-	level, color := f.levelColor(e.Level)
-	sb.WriteString(e.Time.Format("15:04:05"))
-	if f.Color && color != "" {
-		sb.WriteString(color)
+// DefaultFormatter creates a basic Formatter with color printing on or off
+func DefaultFormatter(color bool) Formatter {
+	var colors map[Level]string
+	if color {
+		colors = map[Level]string{
+			LevelDebug: blue,
+			LevelInfo:  green,
+			LevelWarn:  yellow,
+			LevelError: red,
+			LevelTrace: purple,
+		}
 	}
-	sb.WriteString(level)
-	sb.WriteString(fmt.Sprintf("%-42s", e.Message))
-	if f.Color {
+	return NewFormatter("15:04:05", "%-42s", colors)
+}
+
+// NewFormatter creates a log Formatter, using time.Format, fmt formatting, and
+// optional color mode(s)
+func NewFormatter(timeFormat, msgFormat string, colors map[Level]string) Formatter {
+	return &format{
+		TimeFormat:    timeFormat,
+		MessageFormat: msgFormat,
+		Colors:        colors,
+	}
+}
+
+type format struct {
+	TimeFormat    string
+	MessageFormat string
+	Colors        map[Level]string
+}
+
+func (f *format) Format(time time.Time, e *Entry) []byte {
+	var sb strings.Builder
+	sb.WriteString(time.Format(f.TimeFormat))
+	if f.Colors != nil {
+		sb.WriteString(f.Colors[e.Level])
+	}
+	sb.WriteString(f.levelString(e.Level))
+	fmt.Fprintf(&sb, f.MessageFormat, e.Message)
+	if f.Colors != nil {
 		sb.WriteString(nocolor)
 	}
-	for k, v := range e.Data {
-		sb.WriteString(k + "=" + cast.String(v) + " ")
+	for k, v := range e.Fields {
+		fmt.Fprintf(&sb, "%s=%v ", k, v)
 	}
 	sb.WriteByte(10)
-	return []byte(sb.String()), nil
+	return []byte(sb.String())
 }
 
-func (f *Formatter) levelColor(level logrus.Level) (string, string) {
+func (f *format) levelString(level Level) string {
 	switch level {
-	case logrus.DebugLevel:
-		return " D ", gray
-	case logrus.InfoLevel:
-		return " I ", blue
-	case logrus.WarnLevel:
-		return " W ", yellow
-	case logrus.ErrorLevel:
-		return " E ", red
-	case logrus.PanicLevel:
-		return " P ", red
-	case logrus.FatalLevel:
-		return " F ", red
+	case LevelDebug:
+		return " D "
+	case LevelInfo:
+		return " I "
+	case LevelWarn:
+		return " W "
+	case LevelError:
+		return " E "
+	case LevelTrace:
+		return " T "
 	default:
-		return " ? ", ""
+		return " ? "
 	}
 }

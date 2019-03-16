@@ -33,14 +33,3 @@ func identifyPanic() string {
 
 	return fmt.Sprintf("pc:%x", pc)
 }
-
-func (log *log) recoverPanic() {
-	r := recover()
-	if r == nil {
-		return
-	}
-	log.WithFields(Fields{
-		"Error": r,
-		"Path":  identifyPanic(),
-	}).Error("log.recover")
-}
