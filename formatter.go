@@ -55,10 +55,12 @@ type format struct {
 func (f *format) Format(time time.Time, e *Entry) []byte {
 	var sb strings.Builder
 	sb.WriteString(time.Format(f.TimeFormat))
+	sb.WriteByte(32)
 	if f.Colors != nil {
 		sb.WriteString(f.Colors[e.Level])
+	} else {
+		sb.WriteString(f.levelString(e.Level))
 	}
-	sb.WriteString(f.levelString(e.Level))
 	fmt.Fprintf(&sb, f.MessageFormat, e.Prefix+e.Message)
 	if f.Colors != nil {
 		sb.WriteString(nocolor)
@@ -73,16 +75,16 @@ func (f *format) Format(time time.Time, e *Entry) []byte {
 func (f *format) levelString(level Level) string {
 	switch level {
 	case LevelDebug:
-		return " D "
+		return "D "
 	case LevelInfo:
-		return " I "
+		return "I "
 	case LevelWarn:
-		return " W "
+		return "W "
 	case LevelError:
-		return " E "
+		return "E "
 	case LevelTrace:
-		return " T "
+		return "T "
 	default:
-		return " ? "
+		return "? "
 	}
 }
