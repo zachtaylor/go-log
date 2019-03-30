@@ -1,5 +1,7 @@
 package log
 
+import "os"
+
 // Fields is log data
 type Fields map[string]interface{}
 
@@ -10,5 +12,5 @@ func DailyRollingService(level Level, path string) Service {
 
 // StdOutService creates a log service that wraps std out
 func StdOutService(level Level) Service {
-	return NewService(level, DefaultFormatter(true), stdout())
+	return NewService(level, DefaultFormatter(true), os.Stdout)
 }

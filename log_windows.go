@@ -3,11 +3,11 @@
 package log
 
 import (
-	"io"
+	"syscall"
 
-	colorable "github.com/mattn/go-colorable"
+	"github.com/konsorten/go-windows-terminal-sequences"
 )
 
-func stdout() io.Writer {
-	return colorable.NewColorableStdout()
+func init() {
+	sequences.EnableVirtualTerminalProcessing(syscall.Stdout, true)
 }
