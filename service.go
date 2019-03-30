@@ -7,6 +7,7 @@ import (
 
 // Service provides logging functionality
 type Service interface {
+	io.Closer
 	// New creates a log
 	New() *Entry
 	// Write flushes a log message
@@ -14,7 +15,7 @@ type Service interface {
 }
 
 // NewService creates a log service with the minimum Level, format function and output dest
-func NewService(level Level, f Formatter, w io.Writer) Service {
+func NewService(level Level, f Formatter, w io.WriteCloser) Service {
 	return &service{
 		level: level,
 		f:     f,
@@ -25,7 +26,7 @@ func NewService(level Level, f Formatter, w io.Writer) Service {
 type service struct {
 	level Level
 	f     Formatter
-	w     io.Writer
+	w     io.WriteCloser
 }
 
 func (svc *service) New() *Entry {
@@ -36,4 +37,8 @@ func (svc *service) Write(log *Entry) {
 	if log.Level >= svc.level {
 		svc.w.Write(svc.f.Format(time.Now(), log))
 	}
+}
+
+func (svc *service) Close() error {
+	return svc.w.Close()
 }
