@@ -46,12 +46,12 @@ func (log *Entry) Copy() *Entry {
 	}
 }
 
-// Tag sets the
+// Tag sets the message prefix
 func (log *Entry) Tag(tag string) *Entry {
 	if log.Prefix == "" {
-		log.Prefix = tag
+		log.Prefix = tag + ": "
 	} else {
-		log.Prefix = log.Prefix + ": " + tag
+		log.Prefix += tag + ": "
 	}
 	return log
 }

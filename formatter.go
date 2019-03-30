@@ -59,7 +59,7 @@ func (f *format) Format(time time.Time, e *Entry) []byte {
 		sb.WriteString(f.Colors[e.Level])
 	}
 	sb.WriteString(f.levelString(e.Level))
-	fmt.Fprintf(&sb, f.MessageFormat, e.Message)
+	fmt.Fprintf(&sb, f.MessageFormat, e.Prefix+e.Message)
 	if f.Colors != nil {
 		sb.WriteString(nocolor)
 	}
