@@ -12,7 +12,7 @@ const (
 	green   = "\x1b[32m"
 	yellow  = "\x1b[33m"
 	purple  = "\x1b[35m"
-	blue    = "\x1b[36m"
+	cyan    = "\x1b[36m"
 )
 
 // Formatter encodes a log
@@ -26,8 +26,8 @@ func DefaultFormatter(color bool) Formatter {
 	var colors map[Level]string
 	if color {
 		colors = map[Level]string{
-			LevelDebug: blue,
-			LevelInfo:  green,
+			LevelDebug: green,
+			LevelInfo:  cyan,
 			LevelWarn:  yellow,
 			LevelError: red,
 			LevelTrace: purple,
