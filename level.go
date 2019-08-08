@@ -7,7 +7,7 @@ type Level uint8
 
 const (
 	// LevelDebug is the lowest level
-	LevelDebug = iota
+	LevelDebug = iota + 1
 	// LevelInfo is the default level
 	LevelInfo
 	// LevelWarn is a raised level

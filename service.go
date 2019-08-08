@@ -34,7 +34,7 @@ func (svc *service) New() *Entry {
 }
 
 func (svc *service) Write(log *Entry) {
-	if log.Level >= svc.level {
+	if log.Level < LevelDebug || log.Level >= svc.level {
 		svc.w.Write(svc.f.Format(time.Now(), log))
 	}
 }

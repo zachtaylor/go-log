@@ -1,11 +1,10 @@
 package log
 
-// NewEntry creates a new entry
+// NewEntry creates a new Entry
 func NewEntry(service Service) *Entry {
 	return &Entry{
 		Service: service,
 		Fields:  make(Fields),
-		Level:   LevelInfo,
 	}
 }
 
@@ -59,35 +58,34 @@ func (log *Entry) Tag(tag string) *Entry {
 // Debug calls Write with LevelDebug
 func (log *Entry) Debug(v string) {
 	log.Level = LevelDebug
-	log.Write(v)
+	log.write(v)
 }
 
 // Info calls Write with LevelInfo
 func (log *Entry) Info(v string) {
 	log.Level = LevelInfo
-	log.Write(v)
+	log.write(v)
 }
 
 // Warn calls Write with LevelWarn
 func (log *Entry) Warn(v string) {
 	log.Level = LevelWarn
-	log.Write(v)
+	log.write(v)
 }
 
 // Warn calls Write with LevelWarn
 func (log *Entry) Error(v string) {
 	log.Level = LevelError
-	log.Write(v)
+	log.write(v)
 }
 
 // Trace calls Write with LevelTrace
 func (log *Entry) Trace(v string) {
 	log.Level = LevelTrace
-	log.Write(v)
+	log.write(v)
 }
 
-// Write flushes the log with the given message
-func (log *Entry) Write(v string) {
+func (log *Entry) write(v string) {
 	log.Message = v
 	log.Service.Write(log)
 }
