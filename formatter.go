@@ -66,8 +66,8 @@ func (f *format) Format(time time.Time, e *Entry) []byte {
 	if f.Colors != nil {
 		sb.WriteString(nocolor)
 	}
-	for k, v := range e.Fields {
-		fmt.Fprintf(&sb, "%s=%v ", k, v)
+	for _, k := range e.Fields.SortKeys() {
+		fmt.Fprintf(&sb, "%s=%v ", k, e.Fields[k])
 	}
 	sb.WriteByte(10)
 	return []byte(sb.String())
