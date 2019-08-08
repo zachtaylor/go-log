@@ -35,3 +35,21 @@ func GetLevel(level string) (Level, error) {
 		return LevelDebug, errors.New("log level unknown: " + level)
 	}
 }
+
+// ByteCode returns an ASCII byte code for this level
+func (level Level) ByteCode() byte {
+	switch level {
+	case LevelDebug:
+		return 68 // D
+	case LevelInfo:
+		return 73 // I
+	case LevelWarn:
+		return 87 // W
+	case LevelError:
+		return 69 // E
+	case LevelTrace:
+		return 84 // T
+	default:
+		return 63 // ?
+	}
+}

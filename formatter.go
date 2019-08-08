@@ -59,7 +59,8 @@ func (f *format) Format(time time.Time, e *Entry) []byte {
 	if f.Colors != nil {
 		sb.WriteString(f.Colors[e.Level])
 	} else {
-		sb.WriteString(f.levelString(e.Level))
+		sb.WriteByte(e.Level.ByteCode())
+		sb.WriteByte(32)
 	}
 	fmt.Fprintf(&sb, f.MessageFormat, e.Prefix+e.Message)
 	if f.Colors != nil {
@@ -70,21 +71,4 @@ func (f *format) Format(time time.Time, e *Entry) []byte {
 	}
 	sb.WriteByte(10)
 	return []byte(sb.String())
-}
-
-func (f *format) levelString(level Level) string {
-	switch level {
-	case LevelDebug:
-		return "D "
-	case LevelInfo:
-		return "I "
-	case LevelWarn:
-		return "W "
-	case LevelError:
-		return "E "
-	case LevelTrace:
-		return "T "
-	default:
-		return "? "
-	}
 }
