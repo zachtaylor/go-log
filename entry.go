@@ -1,5 +1,7 @@
 package log
 
+import "time"
+
 // NewEntry creates a new Entry
 func NewEntry(service Service) *Entry {
 	return &Entry{
@@ -13,8 +15,7 @@ type Entry struct {
 	Service
 	Fields
 	Level
-	Prefix  string
-	Message string
+	Prefix string
 }
 
 // Add writes any value to the Fields
@@ -48,59 +49,43 @@ func (log *Entry) Copy() *Entry {
 // Tag sets the message prefix
 func (log *Entry) Tag(tag string) *Entry {
 	if log.Prefix == "" {
-		log.Prefix = tag + ": "
+		log.Prefix = tag
 	} else {
-		log.Prefix += tag + ": "
+		log.Prefix += ": " + tag
 	}
 	return log
 }
 
 // Debug calls Write with LevelDebug
-func (log *Entry) Debug(v string) {
+func (log *Entry) Debug(args ...interface{}) {
 	log.Level = LevelDebug
-	log.write(v)
+	log.write(args...)
 }
 
 // Info calls Write with LevelInfo
-func (log *Entry) Info(v string) {
+func (log *Entry) Info(args ...interface{}) {
 	log.Level = LevelInfo
-	log.write(v)
+	log.write(args...)
 }
 
 // Warn calls Write with LevelWarn
-func (log *Entry) Warn(v string) {
+func (log *Entry) Warn(args ...interface{}) {
 	log.Level = LevelWarn
-	log.write(v)
+	log.write(args...)
 }
 
 // Warn calls Write with LevelWarn
-func (log *Entry) Error(v string) {
+func (log *Entry) Error(args ...interface{}) {
 	log.Level = LevelError
-	log.write(v)
+	log.write(args...)
 }
 
 // Trace calls Write with LevelTrace
-func (log *Entry) Trace(v string) {
+func (log *Entry) Trace(args ...interface{}) {
 	log.Level = LevelTrace
-	log.write(v)
+	log.write(args...)
 }
 
-func (log *Entry) write(v string) {
-	log.Message = v
-	log.Service.Write(log)
-}
-
-// Protect calls a func and writes an error if the func causes a panic
-//
-// Adds "Error", "Source" values to log
-func (log *Entry) Protect(f func()) {
-	defer func() {
-		if err := recover().(error); err != nil {
-			log.With(Fields{
-				"Source": identifyPanic(),
-				"Error":  err,
-			}).Error("panic stopped")
-		}
-	}()
-	f()
+func (log *Entry) write(args ...interface{}) {
+	log.Service.Write(time.Now(), log, args...)
 }

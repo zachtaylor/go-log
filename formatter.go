@@ -18,7 +18,7 @@ const (
 // Formatter encodes a log
 type Formatter interface {
 	// Format creates writable output
-	Format(time.Time, *Entry) []byte
+	Format(time.Time, *Entry, ...interface{}) []byte
 }
 
 // DefaultFormatter creates a basic Formatter with color printing on or off
@@ -52,23 +52,42 @@ type format struct {
 	Colors        map[Level]string
 }
 
-func (f *format) Format(time time.Time, e *Entry) []byte {
+func (f *format) Format(time time.Time, e *Entry, args ...interface{}) []byte {
 	var sb strings.Builder
 	sb.WriteString(time.Format(f.TimeFormat))
-	sb.WriteByte(32)
+	sb.WriteByte(32) // space
 	if f.Colors != nil {
 		sb.WriteString(f.Colors[e.Level])
 	} else {
 		sb.WriteByte(e.Level.ByteCode())
-		sb.WriteByte(32)
+		sb.WriteByte(32) // space
 	}
-	fmt.Fprintf(&sb, f.MessageFormat, e.Prefix+e.Message)
+	if msg := buildmessage(args...); e.Prefix == "" {
+		fmt.Fprintf(&sb, f.MessageFormat, msg)
+	} else if msg == "" {
+		fmt.Fprintf(&sb, f.MessageFormat, e.Prefix)
+	} else {
+		fmt.Fprintf(&sb, f.MessageFormat, e.Prefix+": "+msg)
+	}
 	if f.Colors != nil {
 		sb.WriteString(nocolor)
 	}
 	for _, k := range e.Fields.SortKeys() {
 		fmt.Fprintf(&sb, "%s=%v ", k, e.Fields[k])
 	}
-	sb.WriteByte(10)
+	sb.WriteByte(10) // newline
 	return []byte(sb.String())
+}
+
+func buildmessage(args ...interface{}) string {
+	var msg string // build message
+	if len(args) > 0 {
+		for i, arg := range args {
+			if i > 0 {
+				msg += " "
+			}
+			msg += fmt.Sprintf("%v", arg)
+		}
+	}
+	return msg
 }
