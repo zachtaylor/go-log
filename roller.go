@@ -69,7 +69,9 @@ func (w *roller) wait(roller *time.Ticker) error {
 		case <-roller.C:
 			return nil
 		case msg := <-w.publish:
-			w.Write(msg)
+			if _, err := w.w.Write(msg); err != nil {
+				return err
+			}
 		case <-w.done:
 			return io.EOF
 		}
