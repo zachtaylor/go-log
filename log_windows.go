@@ -5,7 +5,7 @@ package log
 import (
 	"syscall"
 
-	"github.com/konsorten/go-windows-terminal-sequences"
+	sequences "github.com/konsorten/go-windows-terminal-sequences"
 )
 
 func init() {
