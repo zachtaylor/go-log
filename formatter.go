@@ -1,10 +1,6 @@
 package log
 
-import (
-	"fmt"
-	"strings"
-	"time"
-)
+import "ztaylor.me/cast"
 
 const (
 	nocolor = "\x1b[0m"
@@ -18,7 +14,7 @@ const (
 // Formatter encodes a log
 type Formatter interface {
 	// Format creates writable output
-	Format(time.Time, *Entry, ...interface{}) []byte
+	Format(cast.Time, *Entry, ...interface{}) []byte
 }
 
 // DefaultFormatter creates a basic Formatter with color printing on or off
@@ -52,8 +48,8 @@ type format struct {
 	Colors        map[Level]string
 }
 
-func (f *format) Format(time time.Time, e *Entry, args ...interface{}) []byte {
-	var sb strings.Builder
+func (f *format) Format(time cast.Time, e *Entry, args ...interface{}) []byte {
+	var sb cast.StringBuilder
 	sb.WriteString(time.Format(f.TimeFormat))
 	sb.WriteByte(32) // space
 	if f.Colors != nil {
@@ -72,8 +68,8 @@ func (f *format) Format(time time.Time, e *Entry, args ...interface{}) []byte {
 	if f.Colors != nil {
 		sb.WriteString(nocolor)
 	}
-	for _, k := range e.Fields.SortKeys() {
-		fmt.Fprintf(&sb, "%s=%v ", k, e.Fields[k])
+	for _, k := range e.Fields.GetKeys() {
+		cast.Fprintf(&sb, "%s=%v ", k, e.Fields[k])
 	}
 	sb.WriteByte(10) // newline
 	return []byte(sb.String())

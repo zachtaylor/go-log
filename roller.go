@@ -1,14 +1,14 @@
 package log
 
 import (
-	"io"
 	"os"
-	"time"
+
+	"ztaylor.me/cast"
 )
 
 // NewRoller creates a log file io.WriteCloser for a system path, which
 // updates to a new file name every day
-func NewRoller(path string) io.WriteCloser {
+func NewRoller(path string) cast.WriteCloser {
 	w := &roller{
 		PathPrefix: path,
 		publish:    make(chan []byte, 0),
@@ -22,7 +22,7 @@ type roller struct {
 	PathPrefix string
 	publish    chan []byte
 	done       chan bool
-	w          io.WriteCloser
+	w          cast.WriteCloser
 }
 
 func (w *roller) Write(bytes []byte) (int, error) {
@@ -43,27 +43,27 @@ func (w *roller) close() {
 	close(w.done)
 }
 
-func (w *roller) fileFormat(time time.Time) string {
+func (w *roller) fileFormat(time cast.Time) string {
 	return w.PathPrefix + time.Format("2006_01_02")
 }
 
 func (w *roller) start() {
-	roller := time.NewTicker(24 * time.Hour)
+	roller := cast.NewTicker(24 * cast.Hour)
 	for {
-		fileTitle := w.fileFormat(time.Now())
+		fileTitle := w.fileFormat(cast.Now())
 		fileName := fileTitle + ".log"
 		file, _ := os.OpenFile(fileName, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
 		w.w = file
 		err := w.wait(roller)
 		file.Close()
-		if err == io.EOF {
+		if err == cast.EOF {
 			return
 		}
 	}
 }
 
 // wait ends with the timer (nil) or when w.done is closed (io.EOF)
-func (w *roller) wait(roller *time.Ticker) error {
+func (w *roller) wait(roller *cast.Ticker) error {
 	for {
 		select {
 		case <-roller.C:
@@ -73,7 +73,7 @@ func (w *roller) wait(roller *time.Ticker) error {
 				return err
 			}
 		case <-w.done:
-			return io.EOF
+			return cast.EOF
 		}
 	}
 }

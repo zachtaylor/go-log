@@ -1,6 +1,6 @@
 package log
 
-import "errors"
+import "ztaylor.me/cast"
 
 // Level is used to rank the importance of logs
 type Level uint8
@@ -32,7 +32,7 @@ func GetLevel(level string) (Level, error) {
 	case "trace":
 		return LevelTrace, nil
 	default:
-		return LevelDebug, errors.New("log level unknown: " + level)
+		return LevelDebug, cast.NewError(nil, "log level unknown: "+level)
 	}
 }
 
