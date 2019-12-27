@@ -58,13 +58,7 @@ func (f *format) Format(time cast.Time, e *Entry, args ...interface{}) []byte {
 		sb.WriteByte(e.Level.ByteCode())
 		sb.WriteByte(32) // space
 	}
-	if msg := buildmessage(args...); e.Prefix == "" {
-		fmt.Fprintf(&sb, f.MessageFormat, msg)
-	} else if msg == "" {
-		fmt.Fprintf(&sb, f.MessageFormat, e.Prefix)
-	} else {
-		fmt.Fprintf(&sb, f.MessageFormat, e.Prefix+": "+msg)
-	}
+	cast.Fprintf(&sb, f.MessageFormat, buildmessage(e, args...))
 	if f.Colors != nil {
 		sb.WriteString(nocolor)
 	}
@@ -75,15 +69,30 @@ func (f *format) Format(time cast.Time, e *Entry, args ...interface{}) []byte {
 	return []byte(sb.String())
 }
 
-func buildmessage(args ...interface{}) string {
-	var msg string // build message
-	if len(args) > 0 {
-		for i, arg := range args {
-			if i > 0 {
-				msg += " "
+func buildmessage(e *Entry, args ...interface{}) string {
+	msg := ""
+	if src := e.GetSource(); src != nil {
+		if src.Pkg != "" {
+			msg = src.Pkg
+		}
+		if src.F != "" {
+			if len(msg) > 0 {
+				msg += "/"
 			}
-			msg += fmt.Sprintf("%v", arg)
+			msg += src.F
+		}
+		if src.Line > 0 {
+			msg += "#" + cast.StringI(src.Line)
 		}
 	}
-	return msg
+	for _, tag := range e.Tags {
+		if len(msg) > 0 {
+			msg += ": "
+		}
+		msg += tag
+	}
+	if len(msg) > 0 && len(args) > 0 {
+		msg += ": "
+	}
+	return msg + cast.StringN(args...)
 }
