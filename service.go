@@ -7,6 +7,8 @@ type Service interface {
 	cast.Closer
 	// New creates a log
 	New() *Entry
+	// Formatter returns the internal formatter
+	Formatter() Formatter
 	// Write flushes a log message
 	Write(cast.Time, *Entry, ...interface{})
 }
@@ -28,6 +30,10 @@ type service struct {
 
 func (svc *service) New() *Entry {
 	return NewEntry(svc)
+}
+
+func (svc *service) Formatter() Formatter {
+	return svc.f
 }
 
 func (svc *service) Write(t cast.Time, log *Entry, args ...interface{}) {
