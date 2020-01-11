@@ -48,9 +48,9 @@ func DefaultTimeFormat() string {
 	return "15:04:05"
 }
 
-// DefaultMessageFormat returns "%-63s " (min 64-char right-padded with last char is space)
+// DefaultMessageFormat returns "%-41s " (min 42-char right-padded with last char is space)
 func DefaultMessageFormat() string {
-	return "%-63s "
+	return "%-41s "
 }
 
 // DefaultColors returns the default color set

@@ -12,9 +12,19 @@ Added log level `Trace`, defined *above* level `Error`. This is easier to follow
 
 ## Change log
 
+### v0.0.7 2020-01-11
+- update `ztaylor.me/cast@v0.0.8`
+- restore default log message minumum length to 42
+
+### v0.0.6 2020-01-05
+- add `Service.Formatter`
+- add `Formatting`, `Source`
+- change `DefaultFormatter(bool)` to `DefaultFormatWithColor()` and `DefaultFormatWithoutColor()`
+- increase default log message length to 42, providing for `Source()` message lengths
+
 ### v0.0.5 2019-12-27
 - add `Entry.Source`, updated formatter
-- add `cmd/ztaylor.me.log.test/main`
+- add `cmd/ztaylor.me.log.test` executable
 
 ### v0.0.4 2019-10-11
 - fix log roller
