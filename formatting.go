@@ -1,11 +1,6 @@
 package log
 
-import (
-	"path"
-	"sort"
-
-	"ztaylor.me/cast"
-)
+import "ztaylor.me/cast"
 
 const (
 	nocolor = "\x1b[0m"
@@ -31,12 +26,12 @@ type Formatting struct {
 // CutSourcePath implements Formatter
 func (f *Formatting) CutSourcePath(parentno int) {
 	source := NewSource(1)
-	filePath, _ := path.Split(source.File())
+	filePath, _ := cast.SplitPath(source.File())
 	for i := 0; cast.Contains(filePath, "/") && i <= parentno; i++ {
 		filePath = filePath[:cast.LastIndex(filePath, "/")]
 	}
 	f.PathCut = append(f.PathCut, filePath)
-	sort.Slice(f.PathCut, func(i, j int) bool {
+	cast.SortSlice(f.PathCut, func(i, j int) bool {
 		return f.PathCut[i] > f.PathCut[j]
 	})
 }
