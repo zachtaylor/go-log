@@ -2,7 +2,7 @@ module ztaylor.me/log
 
 require (
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2
-	ztaylor.me/cast v0.0.10
+	ztaylor.me/cast v0.0.11
 )
 
 go 1.13
