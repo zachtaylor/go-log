@@ -6,21 +6,25 @@ import "ztaylor.me/cast"
 type Level uint8
 
 const (
-	// LevelDebug is the lowest level
-	LevelDebug = iota + 1
+	// LevelTrace is the lowest level
+	LevelTrace = iota
+	// LevelDebug is a more detailed value
+	LevelDebug
 	// LevelInfo is the default level
 	LevelInfo
 	// LevelWarn is a raised level
 	LevelWarn
 	// LevelError is the considered the top level
 	LevelError
-	// LevelTrace is a sentinal value that is guaranteed to print
-	LevelTrace
+	// LevelOut is the highest value, a sentinal value
+	LevelOut
 )
 
 // GetLevel returns the level named, if valid
 func GetLevel(level string) (Level, error) {
 	switch level {
+	case "trace":
+		return LevelTrace, nil
 	case "debug":
 		return LevelDebug, nil
 	case "info":
@@ -29,8 +33,8 @@ func GetLevel(level string) (Level, error) {
 		return LevelWarn, nil
 	case "error":
 		return LevelError, nil
-	case "trace":
-		return LevelTrace, nil
+	case "out":
+		return LevelOut, nil
 	default:
 		return LevelDebug, cast.NewError(nil, "log level unknown: "+level)
 	}
@@ -39,6 +43,8 @@ func GetLevel(level string) (Level, error) {
 // ByteCode returns an ASCII byte code for this level
 func (level Level) ByteCode() byte {
 	switch level {
+	case LevelTrace:
+		return 84 // T
 	case LevelDebug:
 		return 68 // D
 	case LevelInfo:
@@ -47,8 +53,8 @@ func (level Level) ByteCode() byte {
 		return 87 // W
 	case LevelError:
 		return 69 // E
-	case LevelTrace:
-		return 84 // T
+	case LevelOut:
+		return 79 // O
 	default:
 		return 63 // ?
 	}

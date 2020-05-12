@@ -13,27 +13,15 @@ func NewEntry(service Service) *Entry {
 
 // Entry is an intermediate step in creating a log
 type Entry struct {
-	Service
-	src  *Source
-	Tags []string
-	Level
-	Fields cast.JSON
+	Service Service
+	Level   Level
+	Tags    []string
+	Fields  cast.JSON
 }
 
 // Add writes any value to the Fields
 func (log *Entry) Add(k string, v interface{}) *Entry {
 	log.Fields[k] = v
-	return log
-}
-
-// GetSource returns the Source if available
-func (log *Entry) GetSource() *Source {
-	return log.src
-}
-
-// Source sets the src to the moment Source is called
-func (log *Entry) Source() *Entry {
-	log.src = NewSource(1)
 	return log
 }
 
@@ -57,9 +45,9 @@ func (log *Entry) Copy() *Entry {
 	for k, v := range log.Fields {
 		fields[k] = v
 	}
-	tags := make([]string, 0, len(log.Tags))
-	for _, tag := range log.Tags {
-		tags = append(tags, tag)
+	tags := make([]string, len(log.Tags))
+	for i, tag := range log.Tags {
+		tags[i] = tag
 	}
 	return &Entry{
 		Service: log.Service,
@@ -69,32 +57,48 @@ func (log *Entry) Copy() *Entry {
 	}
 }
 
+// Trace calls Write with LevelTrace
+func (log *Entry) Trace(args ...interface{}) {
+	log.Service.Write(cast.Now(), NewSource(1), LevelTrace, log.Fields, parseargs(log.Tags, args...))
+}
+
 // Debug calls Write with LevelDebug
 func (log *Entry) Debug(args ...interface{}) {
-	log.write(LevelDebug, args...)
+	log.Service.Write(cast.Now(), NewSource(1), LevelDebug, log.Fields, parseargs(log.Tags, args...))
 }
 
 // Info calls Write with LevelInfo
 func (log *Entry) Info(args ...interface{}) {
-	log.write(LevelInfo, args...)
+	log.Service.Write(cast.Now(), NewSource(1), LevelInfo, log.Fields, parseargs(log.Tags, args...))
 }
 
 // Warn calls Write with LevelWarn
 func (log *Entry) Warn(args ...interface{}) {
-	log.write(LevelWarn, args...)
+	log.Service.Write(cast.Now(), NewSource(1), LevelWarn, log.Fields, parseargs(log.Tags, args...))
 }
 
 // Warn calls Write with LevelWarn
 func (log *Entry) Error(args ...interface{}) {
-	log.write(LevelError, args...)
+	log.Service.Write(cast.Now(), NewSource(1), LevelError, log.Fields, parseargs(log.Tags, args...))
 }
 
-// Trace calls Write with LevelTrace
-func (log *Entry) Trace(args ...interface{}) {
-	log.write(LevelTrace, args...)
+// Out calls Write with LevelOut
+func (log *Entry) Out(args ...interface{}) {
+	log.Service.Write(cast.Now(), NewSource(1), LevelOut, log.Fields, parseargs(log.Tags, args...))
 }
 
-func (log *Entry) write(lvl Level, args ...interface{}) {
-	log.Level = lvl
-	log.Service.Write(cast.Now(), log, args...)
+func parseargs(tags []string, args ...interface{}) string {
+	sargs := make([]string, len(args))
+	for i, arg := range args {
+		sargs[i] = cast.String(arg)
+	}
+	tags = append(tags, sargs...)
+	var sb cast.StringBuilder
+	for _, arg := range tags {
+		if sb.Len() > 0 {
+			sb.WriteString(": ")
+		}
+		sb.WriteString(arg)
+	}
+	return sb.String()
 }

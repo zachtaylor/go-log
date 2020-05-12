@@ -6,11 +6,24 @@ An opinionated log library
 
 Protects client in cases of reference shadowing
 
+### Automatically cite line numbers
+
+Calls to the `Entry` write methods record their call stack parent
+
 ### Enhanced log levels, color scheme
 
-Added log level `Trace`, defined *above* level `Error`. This is easier to follow, and doesn't impact other log messages.
+Added log level `Out`, defined *above* level `Error`
+
+This is easier to follow, and doesn't impact other log messages
 
 ## Change log
+
+### v0.1.0 2020-04-30
+- add automatic call stack capture (remove `Entry.Source` options)
+- change the behavior of `LevelTrace` to below `LevelDebug`
+- add `LevelOut` above `LevelError`
+- change the signature of `Service.Write`
+- change the log format structure, united under `Format`
 
 ### v0.0.9 2020-03-21
 - update `ztaylor.me/cast@v0.0.11`
